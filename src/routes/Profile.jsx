@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import fbase, { dbService } from "../fbase";
 import { useNavigate } from "react-router-dom";
 
-export default function Profile({ userObj }) {
+export default function Profile({ refreshUser, userObj }) {
   const navigate = useNavigate();
   const [newDisplayName, setNewDisplayName] = useState(userObj.displayName);
 
@@ -33,6 +33,7 @@ export default function Profile({ userObj }) {
       await userObj.updateProfile({
         displayName: newDisplayName,
       });
+      refreshUser();
     }
   };
 
