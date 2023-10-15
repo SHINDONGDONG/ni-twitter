@@ -1,10 +1,12 @@
 import React, { useState } from "react";
-import fbase from "../fbase";
+import fbase, { firebaseInstance } from "../fbase";
 import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  GithubAuthProvider,
 } from "firebase/auth";
+import { GoogleAuthProvider } from "firebase/auth";
 
 export default function Auth() {
   const [email, setEmail] = useState("");
@@ -36,24 +38,28 @@ export default function Auth() {
       }
       console.log(data);
     } catch (err) {
-      console.log(err);
+      alert(err.message);
     }
   };
-  // const onSubmit = async (event) => {
-  //   event.preventDefault();
-  //   try {
-  //     let data;
-  //     const auth = getAuth();
-  //     if (newAccount) {
-  //       data = await createUserWithEmailAndPassword(auth, email, password);
-  //     } else {
-  //       data = await signInWithEmailAndPassword(auth, email, password);
-  //     }
-  //     console.log(data);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+
+  const toggleAccount = () => {
+    setNewAccount((prev) => !prev);
+  };
+
+  const onSolcialClick = async (e) => {
+    const {
+      target: { name },
+    } = e;
+    let provider;
+    if (name === "google") {
+      provider = new GoogleAuthProvider();
+    }
+    if (name === "github") {
+      provider = new GithubAuthProvider();
+    }
+    const data = await fbase.auth().signInWithPopup(provider);
+    console.log(data);
+  };
 
   return (
     <div>
@@ -74,11 +80,21 @@ export default function Auth() {
           value={password}
           onChange={onChange}
         />
-        <input type="submit" value={newAccount ? "Create Account" : "Log In"} />
+        <input
+          type="submit"
+          value={newAccount ? "Create Account" : "Sign In"}
+        />
       </form>
+      <span onClick={toggleAccount}>
+        {newAccount ? "Sign In" : "Create Account"}
+      </span>
       <div>
-        <button>Continue with Google</button>
-        <button>Continue with Github</button>
+        <button onClick={onSolcialClick} name="google">
+          Continue with Google
+        </button>
+        <button onClick={onSolcialClick} name="github">
+          Continue with Github
+        </button>
       </div>
     </div>
   );
