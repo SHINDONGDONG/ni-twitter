@@ -1,51 +1,10 @@
 import React, { useState } from "react";
 import fbase, { firebaseInstance } from "../fbase";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  GithubAuthProvider,
-} from "firebase/auth";
-import { GoogleAuthProvider } from "firebase/auth";
-
+import { GithubAuthProvider, GoogleAuthProvider } from "firebase/auth";
+import AuthForm from "../components/AuthForm";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGithub, faGoogle } from "@fortawesome/free-brands-svg-icons";
 export default function Auth() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [newAccount, setNewAccount] = useState(true);
-
-  const onChange = (e) => {
-    const {
-      target: { name, value },
-    } = e;
-    if (name === "email") {
-      setEmail(value);
-    } else if (name === "password") {
-      setPassword(value);
-    }
-  };
-
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      let data;
-      const auth = getAuth();
-      if (newAccount) {
-        //create account
-        data = await createUserWithEmailAndPassword(auth, email, password);
-      } else {
-        //log in
-        data = await signInWithEmailAndPassword(auth, email, password);
-      }
-      console.log(data);
-    } catch (err) {
-      alert(err.message);
-    }
-  };
-
-  const toggleAccount = () => {
-    setNewAccount((prev) => !prev);
-  };
-
   const onSolcialClick = async (e) => {
     const {
       target: { name },
@@ -63,37 +22,13 @@ export default function Auth() {
 
   return (
     <div>
-      <form onSubmit={onSubmit}>
-        <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          required
-          value={email}
-          onChange={onChange}
-        />
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          required
-          value={password}
-          onChange={onChange}
-        />
-        <input
-          type="submit"
-          value={newAccount ? "Create Account" : "Sign In"}
-        />
-      </form>
-      <span onClick={toggleAccount}>
-        {newAccount ? "Sign In" : "Create Account"}
-      </span>
-      <div>
-        <button onClick={onSolcialClick} name="google">
-          Continue with Google
+      <AuthForm />
+      <div className="buttonContainer">
+        <button className="buttonWrap" onClick={onSolcialClick} name="google">
+          Continue with Google <FontAwesomeIcon icon={faGoogle} size="lg" />
         </button>
-        <button onClick={onSolcialClick} name="github">
-          Continue with Github
+        <button className="buttonWrap" onClick={onSolcialClick} name="github">
+          Continue with Github <FontAwesomeIcon icon={faGithub} size="lg" />
         </button>
       </div>
     </div>

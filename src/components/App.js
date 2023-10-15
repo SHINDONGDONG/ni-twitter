@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import AppRouter from "./router";
 import fbase from "../fbase";
+import "../style/App.css";
 
 function App() {
   const [init, setInit] = useState(false);
@@ -17,6 +18,7 @@ function App() {
           updateProfile: (args) => user.updateProfile(args),
         });
       } else {
+        setUserObj(null);
         setIsLoggedIn(false);
       }
       setInit(true);

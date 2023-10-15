@@ -11,6 +11,7 @@ export default function Profile({ refreshUser, userObj }) {
       .auth()
       .signOut()
       .then((r) => navigate("/"));
+    refreshUser();
   };
   const getMyNweets = async () => {
     const nweets = await dbService
