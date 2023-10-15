@@ -1,9 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import fbase, { dbService } from "../fbase";
 import { useNavigate } from "react-router-dom";
 
 export default function Profile({ userObj }) {
   const navigate = useNavigate();
+  const [newDisplayName, setNewDisplayName] = useState(userObj.displayName);
 
   const onLogOutClick = () => {
     fbase
@@ -24,8 +25,35 @@ export default function Profile({ userObj }) {
   useEffect(() => {
     getMyNweets();
   }, []);
+
+  const onSubmitClick = async (e) => {
+    e.preventDefault();
+    if (userObj.displayName !== newDisplayName) {
+      console.log(userObj.updateProfile);
+      await userObj.updateProfile({
+        displayName: newDisplayName,
+      });
+    }
+  };
+
+  const onChange = (e) => {
+    const {
+      target: { value },
+    } = e;
+    setNewDisplayName(value);
+  };
+
   return (
     <>
+      <form onSubmit={onSubmitClick}>
+        <input
+          onChange={onChange}
+          type="text"
+          placeholder="Display Name"
+          value={newDisplayName}
+        />
+        <input type="submit" value="Update Profile" />
+      </form>
       <button onClick={onLogOutClick}>Log Out</button>
     </>
   );
