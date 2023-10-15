@@ -1,22 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { dbService } from "../fbase";
+import { dbService, storageService } from "../fbase";
 import Nweet from "../components/Nweet";
+import { v4 as uuidv4 } from "uuid";
 
 export default function Home({ userObj }) {
   const [nweet, setNweet] = useState("");
   const [nweets, setNweets] = useState([]);
   const [attachment, setAttachment] = useState("");
-  // const getNweets = async () => {
-  //   const dbnweets = await dbService.collection("nweets").get();
-  //   dbnweets.forEach((document) => {
-  //     const nweetObject = {
-  //       ...document.data(),
-  //       id: document.id,
-  //     };
 
-  //     setNweets((prev) => [nweetObject, ...prev]);
-  //   });
-  // };
   useEffect(() => {
     dbService.collection("nweets").onSnapshot((snapshot) => {
       const newwetArray = snapshot.docs.map((doc) => ({
@@ -29,12 +20,24 @@ export default function Home({ userObj }) {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    await dbService.collection("nweets").add({
+    let attachmentUrl = "";
+    if (attachment != "") {
+      const attachmentRef = storageService
+        .ref()
+        .child(`${userObj.uid}/${uuidv4()}`);
+      const response = await attachmentRef.putString(attachment, "data_url");
+      attachmentUrl = await response.ref.getDownloadURL(); //download url
+    }
+    const nweetObj = {
       text: nweet,
       createdAt: Date.now(),
       creatorId: userObj.uid,
-    });
+      attachmentUrl,
+    };
+
+    await dbService.collection("nweets").add(nweetObj);
     setNweet("");
+    setAttachment("");
   };
   const onChange = (e) => {
     const {
@@ -58,8 +61,8 @@ export default function Home({ userObj }) {
     reader.readAsDataURL(theFile);
   };
 
-  const onClearAttachment = () => setAttachment(null);
-  console.log(nweets);
+  const onClearAttachment = () => setAttachment("");
+
   return (
     <div>
       <form onSubmit={onSubmit}>
@@ -74,7 +77,7 @@ export default function Home({ userObj }) {
         <input type="submit" value="ni-Twitter" />
         {attachment && (
           <div>
-            <img src={attachment} width="50px" height="50px" />
+            <img src={attachment} height="50px" width="50px" />
             <button onClick={onClearAttachment}>Clear Photo</button>
           </div>
         )}
